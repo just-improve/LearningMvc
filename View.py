@@ -19,9 +19,6 @@ class View(ttk.Frame):
         self.save_button = ttk.Button(self, text='Save', command=self.save_button_clicked)
         self.save_button.grid(row=1, column=3, padx=10)
 
-        # message
-        self.message_label = ttk.Label(self, text='', foreground='red')
-        self.message_label.grid(row=2, column=1, sticky=tk.W)
 
         # set the controller
         self.controller = None
@@ -42,36 +39,6 @@ class View(ttk.Frame):
         if self.controller:
             self.controller.save(self.email_var.get())
 
-    def show_error(self, message):
-        """
-        Show an error message
-        :param message:
-        :return:
-        """
-        self.message_label['text'] = message
-        self.message_label['foreground'] = 'red'
-        self.message_label.after(3000, self.hide_message)
-        self.email_entry['foreground'] = 'red'
 
-    def show_success(self, message):
-        """
-        Show a success message
-        :param message:
-        :return:
-        """
-        self.message_label['text'] = message
-        self.message_label['foreground'] = 'green'
-        self.message_label.after(3000, self.hide_message)
-
-        # reset the form
-        self.email_entry['foreground'] = 'black'
-        self.email_var.set('')
-
-    def hide_message(self):
-        """
-        Hide the message
-        :return:
-        """
-        self.message_label['text'] = ''
 
 

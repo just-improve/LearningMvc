@@ -10,15 +10,9 @@ class Controller:
         :param email:
         :return:
         """
-        try:
+        self.model.email = email
+        self.model.save()
 
-            # save the model
-            self.model.email = email
-            self.model.save()
 
-            # show a success message
-            self.view.show_success(f'The email {email} saved!')
 
-        except ValueError as error:
-            # show an error message
-            self.view.show_error(error)
+
