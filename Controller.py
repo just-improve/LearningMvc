@@ -1,28 +1,24 @@
-from Model import Model
-from View import View
-
 
 class Controller:
+    def __init__(self, model, view):
+        self.model = model
+        self.view = view
 
-    def __init__(self):
-        self.model = Model()
-        self.view = View(self)
+    def save(self, email):
+        """
+        Save the email
+        :param email:
+        :return:
+        """
+        try:
 
-    def main(self):
-        self.view.main()
+            # save the model
+            self.model.email = email
+            self.model.save()
 
-    # w tej metodzie przekazać parametry ze wszystkich pól uzupełnionych. Nie wywoływać metody model tylko po prostu zacząć robić pętlę
-    def on_button_click(self, caption):
-        result = self.model.calculate(caption)
-        self.view.value_var.set(result)
+            # show a success message
+            self.view.show_success(f'The email {email} saved!')
 
-    def on_button(self):
-        print("button clicked")
-
-
-if __name__ == '__main__':
-    print("if main")
-    calculator = Controller()
-    calculator.main()
-    print("dasdsas")
-
+        except ValueError as error:
+            # show an error message
+            self.view.show_error(error)

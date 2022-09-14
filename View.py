@@ -1,59 +1,77 @@
 import tkinter as tk
 from tkinter import ttk
 
+class View(ttk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
 
-class View(tk.Tk):
-    PAD = 10
-    MAX_BUTTONS_PER_ROW = 4
+        # create widgets
+        # label
+        self.label = ttk.Label(self, text='Email:')
+        self.label.grid(row=1, column=0)
 
-    button_captions = [
-        'C', '+/-', '%', '/',
-        7, 8, 9, '*',
-        4, 5, 6, '-',
-        1, 2, 3, '+',
-        0, '_', '='
-    ]
+        # email entry
+        self.email_var = tk.StringVar()
+        self.email_entry = ttk.Entry(self, textvariable=self.email_var, width=30)
+        self.email_entry.grid(row=1, column=1, sticky=tk.NSEW)
 
-    def __init__(self, controller):
-        super().__init__()
+        # save button
+        self.save_button = ttk.Button(self, text='Save', command=self.save_button_clicked)
+        self.save_button.grid(row=1, column=3, padx=10)
 
-        self.title('PyCalc')
+        # message
+        self.message_label = ttk.Label(self, text='', foreground='red')
+        self.message_label.grid(row=2, column=1, sticky=tk.W)
 
+        # set the controller
+        self.controller = None
+
+    def set_controller(self, controller):
+        """
+        Set the controller
+        :param controller:
+        :return:
+        """
         self.controller = controller
 
-        self.value_var = tk.StringVar()
+    def save_button_clicked(self):
+        """
+        Handle button click event
+        :return:
+        """
+        if self.controller:
+            self.controller.save(self.email_var.get())
 
-        self._make_main_frame()
+    def show_error(self, message):
+        """
+        Show an error message
+        :param message:
+        :return:
+        """
+        self.message_label['text'] = message
+        self.message_label['foreground'] = 'red'
+        self.message_label.after(3000, self.hide_message)
+        self.email_entry['foreground'] = 'red'
 
-        self._make_entry()
+    def show_success(self, message):
+        """
+        Show a success message
+        :param message:
+        :return:
+        """
+        self.message_label['text'] = message
+        self.message_label['foreground'] = 'green'
+        self.message_label.after(3000, self.hide_message)
 
-        self._make_buttons()
+        # reset the form
+        self.email_entry['foreground'] = 'black'
+        self.email_var.set('')
 
-    def main(self):
-        self.mainloop()
+    def hide_message(self):
+        """
+        Hide the message
+        :return:
+        """
+        self.message_label['text'] = ''
 
-    def _make_main_frame(self):
-        self.main_frm = ttk.Frame(self)
-        self.main_frm.pack(padx=self.PAD, pady=self.PAD)
 
-    def _make_entry(self):  # single underscore is private method
-        ent = ttk.Entry(self.main_frm, justify='right', textvariable=self.value_var, state='disabled')
-        ent.pack(fill='x')
-
-    def _make_buttons(self):
-        outer_frm = ttk.Frame(self.main_frm)
-        outer_frm.pack()
-
-        frm = ttk.Frame(outer_frm)
-        frm.pack()
-        buttons_in_row = 0
-
-        for caption in self.button_captions:
-            if buttons_in_row == self.MAX_BUTTONS_PER_ROW:
-                frm = ttk.Frame(outer_frm)
-                frm.pack()
-                buttons_in_row = 0
-
-            btn = ttk.Button(frm, text=caption, command=(lambda button=caption: self.controller.on_button_click(button)))
-            btn.pack(side='left')
-            buttons_in_row += 1
