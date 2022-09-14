@@ -1,44 +1,59 @@
 import tkinter as tk
 from tkinter import ttk
 
-class View(ttk.Frame):
-    def __init__(self, parent):
-        super().__init__(parent)
 
-        # create widgets
-        # label
-        self.label = ttk.Label(self, text='Email:')
-        self.label.grid(row=1, column=0)
+class View(tk.Tk):
+    PAD = 10
+    MAX_BUTTONS_PER_ROW = 4
 
-        # email entry
-        self.email_var = tk.StringVar()
-        self.email_entry = ttk.Entry(self, textvariable=self.email_var, width=30)
-        self.email_entry.grid(row=1, column=1, sticky=tk.NSEW)
+    button_captions = [
+        'C', '+/-', '%', '/',
+        7, 8, 9, '*',
+        4, 5, 6, '-',
+        1, 2, 3, '+',
+        0, '.', '='
+    ]
 
-        # save button
-        self.save_button = ttk.Button(self, text='Save', command=self.save_button_clicked)
-        self.save_button.grid(row=1, column=3, padx=10)
+    def __init__(self, controller):
+        super().__init__()
 
+        self.title('PyCalc')
 
-        # set the controller
-        self.controller = None
-
-    def set_controller(self, controller):
-        """
-        Set the controller
-        :param controller:
-        :return:
-        """
         self.controller = controller
 
-    def save_button_clicked(self):
-        """
-        Handle button click event
-        :return:
-        """
-        if self.controller:
-            self.controller.save(self.email_var.get())
+        self.value_var = tk.StringVar()
 
+        self._make_main_frame()
 
+        self._make_entry()
 
+        self._make_buttons()
 
+    def main(self):
+        self.mainloop()
+
+    def _make_main_frame(self):
+        self.main_frm = ttk.Frame(self)
+        self.main_frm.pack(padx=self.PAD, pady=self.PAD)
+
+    def _make_entry(self):  # single underscore is private method
+        ent = ttk.Entry(self.main_frm, justify='right', textvariable=self.value_var, state='disabled')
+        ent.pack(fill='x')
+
+    def _make_buttons(self):
+        outer_frm = ttk.Frame(self.main_frm)
+        outer_frm.pack()
+
+        frm = ttk.Frame(outer_frm)
+        frm.pack()
+        buttons_in_row = 0
+
+        for caption in self.button_captions:
+            if buttons_in_row == self.MAX_BUTTONS_PER_ROW:
+                frm = ttk.Frame(outer_frm)
+                frm.pack()
+                buttons_in_row = 0
+
+            btn = ttk.Button(frm, text=caption, command=(lambda button=caption: self.controller.on_button_click(button)))
+            btn.pack(side='left')
+            buttons_in_row += 1
